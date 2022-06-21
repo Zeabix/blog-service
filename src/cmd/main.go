@@ -11,11 +11,11 @@ import (
 	"time"
 
 	"github.com/go-kit/kit/log"
-	"github.com/zeabix/blog-service/src/blog"
-	"github.com/zeabix/blog-service/src/healthcheck"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
+	"zeabix.com/blog-service/blog"
+	"zeabix.com/blog-service/healthcheck"
 )
 
 func main() {

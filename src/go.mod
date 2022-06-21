@@ -1,4 +1,4 @@
-module github.com/zeabix/blog-service
+module zeabix.com/blog-service
 
 go 1.18
 
