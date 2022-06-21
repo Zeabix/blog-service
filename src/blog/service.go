@@ -23,12 +23,13 @@ var (
 )
 
 type Blog struct {
-	Topic     string
-	Content   string
-	Status    string
-	Published time.Time
-	Author    string
-	Likes     uint64
+	ID        primitive.ObjectID `json:"id",bson:"_id"`
+	Topic     string             `json:"topic",bson:"topic"`
+	Content   string             `json:"content",bson:"content"`
+	Status    string             `json:"status",bson:"status"`
+	Published time.Time          `json:"published",bson:"published"`
+	Author    string             `json:"author",bson:"author"`
+	Likes     uint64             `json:"likes",bson:"likes"`
 }
 
 var (

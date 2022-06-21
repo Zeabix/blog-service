@@ -24,28 +24,28 @@ func MakeHTTPHandler(s Service, logger log.Logger) http.Handler {
 		httptransport.ServerErrorEncoder(encodeError),
 	}
 
-	r.Methods("POST").Path("/blogs/").Handler(httptransport.NewServer(
+	r.Methods("POST").Path("/blogs/v1/blogs/").Handler(httptransport.NewServer(
 		e.CreateBlogEndpoint,
 		decodePostBlogRequest,
 		encodeResponse,
 		options...,
 	))
 
-	r.Methods("GET").Path("/blogs").Handler(httptransport.NewServer(
+	r.Methods("GET").Path("/blogs/v1/blogs").Handler(httptransport.NewServer(
 		e.ListBlogEndpoint,
 		decodeListBlogRequest,
 		encodeResponse,
 		options...,
 	))
 
-	r.Methods("GET").Path("/blogs/{id}").Handler(httptransport.NewServer(
+	r.Methods("GET").Path("/blogs/v1/blogs/{id}").Handler(httptransport.NewServer(
 		e.GetBlogEndpoint,
 		decodeGetBlogRequest,
 		encodeResponse,
 		options...,
 	))
 
-	r.Methods("PUT").Path("/blogs/{id}/published").Handler(httptransport.NewServer(
+	r.Methods("PUT").Path("/blogs/v1/blogs/{id}/published").Handler(httptransport.NewServer(
 		e.PublishBlogEndpoint,
 		decodePublishBlogRequest,
 		encodeResponse,
@@ -82,7 +82,7 @@ func decodeListBlogRequest(_ context.Context, r *http.Request) (request interfac
 
 func decodePostBlogRequest(_ context.Context, r *http.Request) (request interface{}, err error) {
 	var req createBlogRequest
-	if e := json.NewDecoder(r.Body).Decode(&req.Blog); e != nil {
+	if e := json.NewDecoder(r.Body).Decode(&req); e != nil {
 		return nil, e
 	}
 	return req, nil

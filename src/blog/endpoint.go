@@ -25,8 +25,14 @@ func MakeServerEndpoint(s Service) Endpoints {
 func makeCreateBlogEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(createBlogRequest)
-		id, err := s.CreateBlog(ctx, req.Blog)
-		return createBlogResponse{ID: id, Err: err}, err
+		b := Blog{
+			Topic:   req.Topic,
+			Content: req.Content,
+			Author:  req.Author,
+			Status:  Draft,
+		}
+		id, err := s.CreateBlog(ctx, b)
+		return createBlogResponse{ID: id}, err
 	}
 }
 
@@ -34,7 +40,7 @@ func makeGetBlogEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(getBlogRequest)
 		b, err := s.GetBlog(ctx, req.ID)
-		return getBlogResponse{Item: b, Err: err}, err
+		return b, err
 	}
 }
 
@@ -42,7 +48,7 @@ func makeListBlogsEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		_ = request.(listBlogRequest)
 		list, err := s.ListBlogs(ctx)
-		return listBlogResponse{Items: list, Err: err}, err
+		return list, err
 	}
 }
 
@@ -50,41 +56,27 @@ func makePublishBlogEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(publishBlogRequest)
 		b, err := s.PublishBlog(ctx, req.ID)
-		return publishBlogResponse{Item: b, Err: err}, err
+		return b, err
 	}
 }
 
 type createBlogRequest struct {
-	Blog Blog
+	Topic   string `json:"topic"`
+	Content string `json:"content"`
+	Author  string `json:"content"`
 }
 
 type createBlogResponse struct {
-	ID  string
-	Err error
+	ID string `json: "id"`
 }
 
 type getBlogRequest struct {
 	ID string
 }
 
-type getBlogResponse struct {
-	Item *Blog
-	Err  error
-}
-
 type listBlogRequest struct {
-}
-
-type listBlogResponse struct {
-	Items []Blog
-	Err   error
 }
 
 type publishBlogRequest struct {
 	ID string
-}
-
-type publishBlogResponse struct {
-	Item *Blog
-	Err  error
 }

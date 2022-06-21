@@ -8,7 +8,6 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
 	"github.com/go-kit/kit/log"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -37,8 +36,10 @@ func main() {
 		logger = log.With(logger, "caller", log.DefaultCaller)
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(time.Second*5))
-	defer cancel()
+	//ctx, cancel := context.WithTimeout(context.Background(), time.Duration(time.Second*5))
+	//defer cancel()
+
+	ctx := context.TODO()
 	client, err := makeMongoClient(ctx, mongoUrl)
 
 	if err = client.Ping(ctx, readpref.Primary()); err != nil {
