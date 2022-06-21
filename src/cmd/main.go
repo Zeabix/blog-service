@@ -22,11 +22,13 @@ func main() {
 
 	var (
 		httpAddr    = flag.String("http.addr", ":8080", "HTTP listen address")
-		mongoUrl    = flag.String("mongo.url", "mongodb://localhost:27017", "Connection URL for mongodb")
-		mongoDbname = flag.String("mongo.dbname", "blogs", "Mongo Database name")
-		mongoCol    = flag.String("mongo.colname", "blogs", "Mongo Collection name")
+		mongoUrl    = os.Getenv("MONGO_CONNNECTION_URL") //flag.String("mongo.url", "mongodb://localhost:27017", "Connection URL for mongodb")
+		mongoDbname = os.Getenv("MONGO_DATABASE_NAME")   //flag.String("mongo.dbname", "blogs", "Mongo Database name")
+		mongoCol    = os.Getenv("MONGO_COLLECTION_NAME") //flag.String("mongo.colname", "blogs", "Mongo Collection name")
 	)
 	flag.Parse()
+
+	var ()
 
 	var logger log.Logger
 	{
@@ -37,14 +39,14 @@ func main() {
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(time.Second*5))
 	defer cancel()
-	client, err := makeMongoClient(ctx, *mongoUrl)
+	client, err := makeMongoClient(ctx, mongoUrl)
 
 	if err = client.Ping(ctx, readpref.Primary()); err != nil {
 		logger.Log("Unable to connect to DB, shutdown")
 		panic("Unable to connect to DB")
 	}
 
-	col := client.Database(*mongoDbname).Collection(*mongoCol)
+	col := client.Database(mongoDbname).Collection(mongoCol)
 
 	if err != nil {
 		panic(err)
