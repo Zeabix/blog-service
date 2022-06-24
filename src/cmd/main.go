@@ -9,6 +9,10 @@ import (
 	"os/signal"
 	"syscall"
 
+	kitprometheus "github.com/go-kit/kit/metrics/prometheus"
+	stdprometheus "github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+
 	"github.com/go-kit/kit/log"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -53,9 +57,27 @@ func main() {
 		panic(err)
 	}
 
+	fieldKeys := []string{"method"}
+
 	var s blog.Service
 	{
 		s = blog.NewMongoBlogService(*col)
+		s = blog.NewLoggingMiddleware(logger, s)
+		s = blog.NewInstrucmentingMiddleware(
+			kitprometheus.NewCounterFrom(stdprometheus.CounterOpts{
+				Namespace: "api",
+				Subsystem: "blog_service",
+				Name:      "request_count",
+				Help:      "number of requests recieved",
+			}, fieldKeys),
+			kitprometheus.NewSummaryFrom(stdprometheus.SummaryOpts{
+				Namespace: "api",
+				Subsystem: "blog_service",
+				Name:      "request_latency_microseconds",
+				Help:      "Total duration of requests in microseconds.",
+			}, fieldKeys),
+			s,
+		)
 	}
 
 	var h http.Handler
@@ -69,6 +91,7 @@ func main() {
 	mux.Handle("/health", healthcheck.MakeHealthCheckHandler(*client))
 
 	http.Handle("/", accessControl(mux))
+	http.Handle("/metrics", promhttp.Handler())
 
 	errs := make(chan error)
 	go func() {
@@ -89,7 +112,7 @@ func main() {
 func accessControl(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT")
 		w.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type")
 
 		if r.Method == "OPTIONS" {

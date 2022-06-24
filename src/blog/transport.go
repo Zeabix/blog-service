@@ -24,7 +24,7 @@ func MakeHTTPHandler(s Service, logger log.Logger) http.Handler {
 		httptransport.ServerErrorEncoder(encodeError),
 	}
 
-	r.Methods("POST").Path("/blogs/v1/blogs/").Handler(httptransport.NewServer(
+	r.Methods("POST").Path("/blogs/v1/blogs").Handler(httptransport.NewServer(
 		e.CreateBlogEndpoint,
 		decodePostBlogRequest,
 		encodeResponse,
@@ -95,12 +95,18 @@ func encodeResponse(ctx context.Context, w http.ResponseWriter, response interfa
 		encodeError(ctx, e.error(), w)
 		return nil
 	}
+	data := response.(accessor)
+
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	return json.NewEncoder(w).Encode(response)
+	return json.NewEncoder(w).Encode(data.data())
 }
 
 type errorer interface {
 	error() error
+}
+
+type accessor interface {
+	data() interface{}
 }
 
 func encodeError(_ context.Context, err error, w http.ResponseWriter) {

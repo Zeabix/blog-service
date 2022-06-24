@@ -23,13 +23,13 @@ var (
 )
 
 type Blog struct {
-	ID        primitive.ObjectID `json:"id",bson:"_id"`
-	Topic     string             `json:"topic",bson:"topic"`
-	Content   string             `json:"content",bson:"content"`
-	Status    string             `json:"status",bson:"status"`
-	Published time.Time          `json:"published",bson:"published"`
-	Author    string             `json:"author",bson:"author"`
-	Likes     uint64             `json:"likes",bson:"likes"`
+	ID        primitive.ObjectID `json:"id,omitempty" bson:"_id,omitempty"`
+	Topic     string             `json:"topic" bson:"topic"`
+	Content   string             `json:"content" bson:"content"`
+	Status    string             `json:"status" bson:"status"`
+	Published time.Time          `json:"published" bson:"published"`
+	Author    string             `json:"author" bson:"author"`
+	Likes     uint64             `json:"likes" bson:"likes"`
 }
 
 var (
@@ -81,7 +81,7 @@ func (s *mongoBlogService) ListBlogs(ctx context.Context) ([]Blog, error) {
 	}
 	defer cur.Close(ctx)
 
-	var results []Blog
+	results := []Blog{}
 	for cur.Next(ctx) {
 		var item Blog
 		err = cur.Decode(&item)
@@ -101,28 +101,16 @@ func (s *mongoBlogService) PublishBlog(ctx context.Context, id string) (*Blog, e
 		return nil, err
 	}
 
-	res := s.collection.FindOne(ctx, bson.M{"_id": oid})
-	err = res.Err()
-	if err != nil {
-		return nil, err
-	}
+	filter := bson.D{{"_id", oid}}
+	updated := bson.D{{"$set", bson.M{"status": Published, "published": time.Now()}}}
 
-	var b Blog
-	err = res.Decode(&b)
-	if err != nil {
-		return nil, err
-	}
-
-	b.Published = time.Now()
-	b.Status = Published
-
-	update, err := s.collection.UpdateOne(ctx, bson.M{"_id": oid}, b)
+	update, err := s.collection.UpdateOne(ctx, filter, updated)
 	if err != nil {
 		return nil, err
 	}
 
 	if update.ModifiedCount > 0 {
-		return &b, nil
+		return s.GetBlog(ctx, id)
 	} else {
 		return nil, errors.New("Unable to update document")
 	}
