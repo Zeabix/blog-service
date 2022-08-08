@@ -1,5 +1,7 @@
 # Blog Service API
 
+![Status](https://github.com/Zeabix/blog-service/actions/workflows/simple-dev-pipeline.yml/badge.svg)
+
 ### Environment variables
 * `MONGO_CONNNECTION_URL`  :  Connection URL to mongoDB, e.g. mongodb://localhost:27017
 * `MONGO_DATABASE_NAME`   :  Mongo Database name, e.g. blogs
