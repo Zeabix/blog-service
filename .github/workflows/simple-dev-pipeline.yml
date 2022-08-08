@@ -1,9 +1,8 @@
 name: Simple Dev Build pipeline Unittest
 on: 
-  workflow_dispatch:
-    push:
-      branches:
-        - main
+  push:
+    branches:
+      - main
 jobs:
   Unittest:
     runs-on: ubuntu-latest
