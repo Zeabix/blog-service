@@ -24,6 +24,7 @@ jobs:
       run: |
         go test ./...
   Build:
+    needs: Unittest
     name: Build Image
     runs-on: ubuntu-latest
     steps:
