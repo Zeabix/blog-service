@@ -2,7 +2,7 @@ name: Simple Dev Build pipeline Unittest
 on: 
   push:
     branches:
-      - main
+      - candidate
 
 defaults:
   run: 
