@@ -45,6 +45,14 @@ func (m *instrumentingMiddleware) ListBlogs(ctx context.Context) ([]Blog, error)
 	return m.s.ListBlogs(ctx)
 }
 
+func (m *instrumentingMiddleware) ListBlogsDelay(ctx context.Context) ([]Blog, error) {
+	defer func(begin time.Time) {
+		m.requestCount.With("method", "list_blogs_delay").Add(1)
+		m.requestLatency.With("method", "list_blogs_delay").Observe(time.Since(begin).Seconds())
+	}(time.Now())
+	return m.s.ListBlogsDelay(ctx)
+}
+
 func (m *instrumentingMiddleware) PublishBlog(ctx context.Context, id string) (*Blog, error) {
 	defer func(begin time.Time) {
 		m.requestCount.With("method", "publis_blog").Add(1)

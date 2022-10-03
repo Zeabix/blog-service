@@ -45,6 +45,13 @@ func MakeHTTPHandler(s Service, logger log.Logger) http.Handler {
 		options...,
 	))
 
+	r.Methods("GET").Path("/blogs/v2/blogs").Handler(httptransport.NewServer(
+		e.ListBlogDelayEndpoint,
+		decodeListBlogRequest,
+		encodeResponse,
+		options...,
+	))
+
 	r.Methods("PUT").Path("/blogs/v1/blogs/{id}/published").Handler(httptransport.NewServer(
 		e.PublishBlogEndpoint,
 		decodePublishBlogRequest,

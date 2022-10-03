@@ -55,6 +55,18 @@ func (l *loggingMiddleware) ListBlogs(ctx context.Context) (items []Blog, err er
 	return l.s.ListBlogs(ctx)
 }
 
+func (l *loggingMiddleware) ListBlogsDelay(ctx context.Context) (items []Blog, err error) {
+	defer func(begin time.Time) {
+		l.logger.Log(
+			"method", "list_blogs_delay",
+			"count", len(items),
+			"took", time.Since(begin),
+			"error", err,
+		)
+	}(time.Now())
+	return l.s.ListBlogsDelay(ctx)
+}
+
 func (l *loggingMiddleware) PublishBlog(ctx context.Context, id string) (b *Blog, err error) {
 	defer func(begin time.Time) {
 		l.logger.Log(

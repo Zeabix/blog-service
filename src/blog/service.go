@@ -15,6 +15,7 @@ type Service interface {
 	GetBlog(ctx context.Context, id string) (*Blog, error)
 	ListBlogs(ctx context.Context) ([]Blog, error)
 	PublishBlog(ctx context.Context, id string) (*Blog, error)
+	ListBlogsDelay(ctx context.Context) ([]Blog, error)
 }
 
 var (
@@ -75,6 +76,28 @@ func (s *mongoBlogService) GetBlog(ctx context.Context, id string) (*Blog, error
 }
 
 func (s *mongoBlogService) ListBlogs(ctx context.Context) ([]Blog, error) {
+	cur, err := s.collection.Find(ctx, bson.D{})
+	if err != nil {
+		return nil, err
+	}
+	defer cur.Close(ctx)
+
+	results := []Blog{}
+	for cur.Next(ctx) {
+		var item Blog
+		err = cur.Decode(&item)
+		if err != nil {
+			return nil, err
+		}
+
+		results = append(results, item)
+	}
+
+	return results, nil
+}
+
+func (s *mongoBlogService) ListBlogsDelay(ctx context.Context) ([]Blog, error) {
+	time.Sleep(10 * time.Second)
 	cur, err := s.collection.Find(ctx, bson.D{})
 	if err != nil {
 		return nil, err

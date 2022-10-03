@@ -7,18 +7,20 @@ import (
 )
 
 type Endpoints struct {
-	CreateBlogEndpoint  endpoint.Endpoint
-	GetBlogEndpoint     endpoint.Endpoint
-	ListBlogEndpoint    endpoint.Endpoint
-	PublishBlogEndpoint endpoint.Endpoint
+	CreateBlogEndpoint    endpoint.Endpoint
+	GetBlogEndpoint       endpoint.Endpoint
+	ListBlogEndpoint      endpoint.Endpoint
+	PublishBlogEndpoint   endpoint.Endpoint
+	ListBlogDelayEndpoint endpoint.Endpoint
 }
 
 func MakeServerEndpoint(s Service) Endpoints {
 	return Endpoints{
-		CreateBlogEndpoint:  makeCreateBlogEndpoint(s),
-		GetBlogEndpoint:     makeGetBlogEndpoint(s),
-		ListBlogEndpoint:    makeListBlogsEndpoint(s),
-		PublishBlogEndpoint: makePublishBlogEndpoint(s),
+		CreateBlogEndpoint:    makeCreateBlogEndpoint(s),
+		GetBlogEndpoint:       makeGetBlogEndpoint(s),
+		ListBlogEndpoint:      makeListBlogsEndpoint(s),
+		PublishBlogEndpoint:   makePublishBlogEndpoint(s),
+		ListBlogDelayEndpoint: makeListBlogsDelayEndpoint(s),
 	}
 }
 
@@ -48,6 +50,14 @@ func makeListBlogsEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		_ = request.(listBlogRequest)
 		list, err := s.ListBlogs(ctx)
+		return listBlogResponse{Blogs: list, Err: err}, err
+	}
+}
+
+func makeListBlogsDelayEndpoint(s Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		_ = request.(listBlogRequest)
+		list, err := s.ListBlogsDelay(ctx)
 		return listBlogResponse{Blogs: list, Err: err}, err
 	}
 }
