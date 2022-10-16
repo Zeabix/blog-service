@@ -19,7 +19,7 @@ jobs:
           login-server: ${{ secrets.ACR_LOGIN_SERVER }}
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
-      - run: docker push ${{ secrets.ACR_LOGIN_SERVER }}/user-service:${{ github.sha }}
+      - run: docker push ${{ secrets.ACR_LOGIN_SERVER }}/blogs-service:${{ github.sha }}
 
   deploy:
     runs-on: ubuntu-latest
