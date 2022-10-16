@@ -32,7 +32,7 @@ jobs:
           ref: 'master'
           token: ${{ secrets.ACCESS_TOKEN }}
       - name: Update image version
-        run: yq -i e '.userService.tag="${{ github.sha }}"' values.yaml
+        run: yq -i e '.image.tag="${{ github.sha }}"' values.yaml
         working-directory: ./blogs-chart
       - name: Commit & Push changes
         run: |
